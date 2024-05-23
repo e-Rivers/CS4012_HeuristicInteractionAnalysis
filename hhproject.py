@@ -58,7 +58,7 @@ def solve(domain : str, folder : str, heuristics : List[str]):
 
 def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     problemInstances = pd.read_csv(f"BPP-{testGroup}.csv")
-    
+    total_gens = 0
     for index, row in problemInstances.iterrows():
         filename = row["INSTANCE"]
         oracleValue = row["ORACLE"]
@@ -66,10 +66,11 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
         problem = BPP(testGroup + "/" + filename)
         
         # EVOLUTION PROCESS GOES HERE
-        print(f"\nProblem Instance {index}")
-        print(f"\nProblem Name {filename}")
-        hyperHeuristic.solve(problem, oracleValue, ["strongest"])
-        
+        #print(f"\nProblem Instance {index}")
+        #print(f"\nProblem Name {filename}")
+        gens = hyperHeuristic.solve(problem, oracleValue, ["lion_pride"])
+        total_gens += gens
+    print("total gens", total_gens)        
 
 # Trains and tests a KNN hyper-heuristic on any of the given problem domains.
 # To test it, uncomment the corresponding code.
@@ -87,9 +88,9 @@ solveHH("KP", "Instances/KP/Test I", hh)
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 4)
-#solveHH("Test I", gen)
+solveHH("Test I", gen)
 #solveHH("Test II", gen)
-solveHH("Training", gen)
+#solveHH("Training", gen)
 
 """
 features = ["DENSITY", "MAX_DEG", "MIN_DEG"]

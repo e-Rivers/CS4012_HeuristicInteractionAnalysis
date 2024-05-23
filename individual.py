@@ -2,6 +2,7 @@ from typing import Tuple
 import time
 import random
 
+
 class Individual:
 
     def __init__(self, genome : str):
@@ -22,6 +23,20 @@ class Individual:
         modifiedBit = str(int(not int(self._genome[selectedGene])))
         self._genome = self._genome[:selectedGene] + modifiedBit + self._genome[selectedGene+1:]
     
+    def mutate2(self) -> None:
+        #print('original genes')
+        #print(self._genome)
+        random.seed(time.time())
+        mutated = ''
+        for bit in self._genome:
+            flip = random.randint(0, 1)
+            if flip:
+                bit = str(int(not int(bit)))
+            mutated = mutated + bit
+        self._genome = mutated
+        #print('final genes')
+        #print(self._genome)
+
     def recombine(self, mateIndividual):
         random.seed(time.time())
         slicingSection = random.randrange(self.getGenomeLen())

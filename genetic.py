@@ -109,12 +109,50 @@ class GeneticModel(HyperHeuristic):
         selectedIndividuals = [individual[0] for individual in weakestIndividuals] 
         
         return selectedIndividuals
+    
+    """
+    * METHOD 4. Lion Prides
+    * This method is based on lion prides I've seen in some documentaries
+    * about the African ecosystem. In these prides, the alpha male has
+    * the right of reproduction with all the females. 
+    * 
+    * So, let us say the current generation has g individuals. This 
+    * method takes the most convenient individual so far, and it 
+    * recombines it with all the remaining individuals
+    * in the generation. This will yield (g-1) * 2 children. The children
+    * are aggressively mutated, where each gene in their genome has a
+    * 50% probability of being flipped. Only the fittest g individuals 
+    * are kept out of the parents and the children. 
+    * 
+    """
+    def _evolve_lion_prides(self, parentGeneration : List[Tuple[Individual, float]], problem : Problem) -> List[Individual]:
+        alpha = parentGeneration[-1][0]
+        g = len(parentGeneration)
+        mothers = parentGeneration[:-1]#random.sample(parentGeneration, g // 2)
+        mothers = [mother[0] for mother in mothers]
+
+        children = []
+        for mother in mothers:
+            c_children = alpha.recombine(mother)
+            c_children[0].mutate2()
+            c_children[1].mutate2()
+            children += c_children
+
+        # Evaluates the children
+        scoredChildren = self._evaluateGeneration(children, problem)
+        
+        # Adds the evaluated children to the same group as the parents for the duel
+        parentGeneration.extend(scoredChildren)
+        selectedIndividualsScores = sorted(parentGeneration, key=lambda x: x[1])[len(parentGeneration) - g:]
+        selectedIndividuals = [individualScore[0] for individualScore in selectedIndividualsScores]
+        #print('new generation', [xd[1] for xd in selectedIndividualsScores])
+
+        return selectedIndividuals
         
 
 
     # M A I N   E V O L U T I O N A R Y   P R O C E S S
     def solve(self, problem : Problem, target: float, evolutionMethods : List[str] = []) -> None:
-
         self._initGeneration(problem.getItemCount())
 
         for generationNum in range(self._maxGenerations):
@@ -123,9 +161,10 @@ class GeneticModel(HyperHeuristic):
             scoredGeneration = self._evaluateGeneration(self._generation, problem)
 
             # Evaluates if one of the individuals has equaled or outperformed the oracle
-            if scoredGeneration[-1][1] >= target:
+            if round(scoredGeneration[-1][1], 3) >= target:
                 print("Optimal solution has been found!")
                 print(f"Generations: {generationNum}")
+
 
                 # Prints all individuals of the generation that are optimal solutions
                 for individual in scoredGeneration:
@@ -133,25 +172,33 @@ class GeneticModel(HyperHeuristic):
                     if individual[1] >= target:
                         for i in range(0, individual[0].getGenomeLen(), 2):
                             heuristicList.append(self._heuristics[int(individual[0].getGenome()[i:i+2], 2)])
-                        print("Solution:", *heuristicList, sep=" ")
-                        print(f"Score: {individual[1]}")
-                return
+                        #print("Solution:", *heuristicList, sep=" ")
+                        print(f"Score: {individual[1]} target {target}")
+                        for ind in self._generation:
+                            print(ind)
+                        print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
+                return generationNum
 
             # Selects the method that will be used to create the new generation
             random.seed(time.time())
             evolutionMethod = random.choice(["strongest", "weakest"]) \
                                 if len(evolutionMethods) == 0 else \
                                     random.choice(evolutionMethods)
-
             selectedIndividuals = List[Individual]
             if evolutionMethod == "strongest":
                 selectedIndividuals = self._evolve_strongestSelection(scoredGeneration, problem)
             elif evolutionMethod == "weakest":
                 selectedIndividuals = self._evolve_weakestSelection(scoredGeneration, problem)
+            elif evolutionMethod == "lion_pride":
+                selectedIndividuals = self._evolve_lion_prides(scoredGeneration, problem)
 
             # Creates the new generation
             self._generation = selectedIndividuals
-            
-        print(f"NO Optimal solution could be found in {self._maxGenerations} generations...")
+        print(f"NO Optimal solution could be found in {self._maxGenerations} generations target {target}")
+        for ind in self._generation:
+            print(ind)
+        print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
+        print("------------------------------------------------------")
+        return generationNum
 
     
