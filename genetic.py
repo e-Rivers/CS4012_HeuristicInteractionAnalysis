@@ -108,6 +108,42 @@ class GeneticModel(HyperHeuristic):
         weakestIndividuals = sorted(weakIndividuals, key=lambda x: x[1])[:self._populationSize]
         selectedIndividuals = [individual[0] for individual in weakestIndividuals] 
         
+        return selectedIndividuals  
+    
+    """
+    * METHOD 3.
+    * RANDOM PARENT SELECTION
+    *
+    * This offsping generation method selects 2 parents randomly to produce 
+    * 2 children, then, removes the 2 weakest individuals, each remaining individual suffers
+    * a random triple-mutation
+    
+    """
+
+    def _evolve_randomSelection(self, parentGeneration : List[Tuple[Individual, float]], problem : Problem) -> List[Individual]:
+        #Selects two random parents
+        parent1, parent2 = random.sample([individual[0] for individual in parentGeneration], 2)
+        
+        # The parents produce 2 children
+        children = parent1.recombine(parent2)
+
+        # Evaluates the children
+        scoredChildren = self._evaluateGeneration(children, problem)
+        
+        # Adds the evaluated children to the same group as the parents for the duel
+        parentGeneration.extend(scoredChildren)
+
+        # Removes the 2 weakest individuals to mantain the population size
+        strongestIndividuals = sorted(parentGeneration, key=lambda x: x[1])[:-2]
+        
+         # Each remaining individual suffers a random triple-mutation
+        for individual in strongestIndividuals:
+            individual.mutate()
+            individual.mutate()
+            individual.mutate()
+        
+        selectedIndividuals = [individual[0] for individual in strongestIndividuals] 
+        
         return selectedIndividuals
         
 
@@ -148,6 +184,8 @@ class GeneticModel(HyperHeuristic):
                 selectedIndividuals = self._evolve_strongestSelection(scoredGeneration, problem)
             elif evolutionMethod == "weakest":
                 selectedIndividuals = self._evolve_weakestSelection(scoredGeneration, problem)
+            elif evolutionMethod == "random":
+                selectedIndividuals = self._evolve_randomSelection(scoredGeneration, problem)    
 
             # Creates the new generation
             self._generation = selectedIndividuals

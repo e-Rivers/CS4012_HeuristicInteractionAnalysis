@@ -68,7 +68,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
         # EVOLUTION PROCESS GOES HERE
         print(f"\nProblem Instance {index}")
         print(f"\nProblem Name {filename}")
-        hyperHeuristic.solve(problem, oracleValue, ["strongest"])
+        hyperHeuristic.solve(problem, oracleValue, ["random"])
         
 
 # Trains and tests a KNN hyper-heuristic on any of the given problem domains.
@@ -88,8 +88,8 @@ features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 4)
 #solveHH("Test I", gen)
-#solveHH("Test II", gen)
-solveHH("Training", gen)
+solveHH("Test II", gen)
+#solveHH("Training", gen)
 
 """
 features = ["DENSITY", "MAX_DEG", "MIN_DEG"]
