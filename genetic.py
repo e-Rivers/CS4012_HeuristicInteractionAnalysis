@@ -154,29 +154,31 @@ class GeneticModel(HyperHeuristic):
     # M A I N   E V O L U T I O N A R Y   P R O C E S S
     def solve(self, problem : Problem, target: float, evolutionMethods : List[str] = []) -> None:
         self._initGeneration(problem.getItemCount())
+        print('beginning generations')
 
         for generationNum in range(self._maxGenerations):
             
             # Gets the score of each individual (how well do they solve the problem)
             scoredGeneration = self._evaluateGeneration(self._generation, problem)
+            print(self._generation[-1])
 
             # Evaluates if one of the individuals has equaled or outperformed the oracle
             if round(scoredGeneration[-1][1], 3) >= target:
+                print('-------------------------------------------')
                 print("Optimal solution has been found!")
-                print(f"Generations: {generationNum}")
-
-
-                # Prints all individuals of the generation that are optimal solutions
-                for individual in scoredGeneration:
-                    heuristicList = []
-                    if individual[1] >= target:
-                        for i in range(0, individual[0].getGenomeLen(), 2):
-                            heuristicList.append(self._heuristics[int(individual[0].getGenome()[i:i+2], 2)])
-                        #print("Solution:", *heuristicList, sep=" ")
-                        print(f"Score: {individual[1]} target {target}")
-                        for ind in self._generation:
-                            print(ind)
-                        print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
+                if generationNum != 0:
+                    print(f"Generations: {generationNum}")
+                    # Prints all individuals of the generation that are optimal solutions
+                    for individual in scoredGeneration:
+                        heuristicList = []
+                        if individual[1] >= target:
+                            for i in range(0, individual[0].getGenomeLen(), 2):
+                                heuristicList.append(self._heuristics[int(individual[0].getGenome()[i:i+2], 2)])
+                            #print("Solution:", *heuristicList, sep=" ")
+                            print(f"Score: {individual[1]} target {target}")
+                            for ind in self._generation:
+                                print(ind)
+                            print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
                 return generationNum
 
             # Selects the method that will be used to create the new generation
