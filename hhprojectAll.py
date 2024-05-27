@@ -1,4 +1,4 @@
-from genetic import GeneticModel
+from geneticAll import GeneticModel
 from bpp import BPP
 from typing import List
 from phermes import HyperHeuristic
@@ -57,20 +57,17 @@ def solve(domain : str, folder : str, heuristics : List[str]):
     print(text)
 
 def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
-    problemInstances = pd.read_csv(f"BPP-{testGroup}.csv")
-    total_gens = 0
-    for index, row in problemInstances.iterrows():
-        filename = row["INSTANCE"]
-        oracleValue = row["ORACLE"]
+    heuristicSpaceToExplore = 40 if testGroup == "Test II" else 20
+    heuristicSpaceToExplore = int((len(hyperHeuristic.getHeuristics())**heuristicSpaceToExplore)*0.25)
 
-        problem = BPP(testGroup + "/" + filename)
-        
-        # EVOLUTION PROCESS GOES HERE
-        #print(f"\nProblem Instance {index}")
-        #print(f"\nProblem Name {filename}")
-        gens = hyperHeuristic.solve(problem, oracleValue, ["lion_pride"])
-        total_gens += gens
-    print("total gens", total_gens)        
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+    # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
+    heuristicSpaceToExplore = 500
+
+    hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
 
 # Trains and tests a KNN hyper-heuristic on any of the given problem domains.
 # To test it, uncomment the corresponding code.
@@ -87,9 +84,9 @@ solveHH("KP", "Instances/KP/Test I", hh)
 # For BPP
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
-gen = GeneticModel(features, heuristics, 100, 4)
-#solveHH("Test I", gen)
-solveHH("Test II", gen)
+gen = GeneticModel(features, heuristics, 100, 3)
+solveHH("Test I", gen)
+#solveHH("Test II", gen)
 #solveHH("Training", gen)
 
 """

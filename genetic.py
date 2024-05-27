@@ -196,13 +196,13 @@ class GeneticModel(HyperHeuristic):
             
             # Gets the score of each individual (how well do they solve the problem)
             scoredGeneration = self._evaluateGeneration(self._generation, problem)
-            print(self._generation[-1])
+            #print(self._generation[-1])
 
             # Evaluates if one of the individuals has equaled or outperformed the oracle
             if round(scoredGeneration[-1][1], 3) >= target:
-                print('-------------------------------------------')
-                print("Optimal solution has been found!")
                 if generationNum != 0:
+                    print('-------------------------------------------')
+                    print("Optimal solution has been found!")
                     print(f"Generations: {generationNum}")
                     # Prints all individuals of the generation that are optimal solutions
                     for individual in scoredGeneration:
@@ -211,15 +211,16 @@ class GeneticModel(HyperHeuristic):
                             for i in range(0, individual[0].getGenomeLen(), 2):
                                 heuristicList.append(self._heuristics[int(individual[0].getGenome()[i:i+2], 2)])
                             #print("Solution:", *heuristicList, sep=" ")
-                            print(f"Score: {individual[1]} target {target}")
-                            for ind in self._generation:
-                                print(ind)
-                            print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
-                return generationNum
+                    print(f"Score: {individual[1]} target {target}")
+                    for ind in self._generation:
+                        print(ind)
+                    print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
+                    print()
+                    return generationNum
 
             # Selects the method that will be used to create the new generation
             random.seed(time.time())
-            evolutionMethod = random.choice(["strongest", "weakest"]) \
+            evolutionMethod = random.choice(["strongest", "weakest", "lion_pride", "random"]) \
                                 if len(evolutionMethods) == 0 else \
                                     random.choice(evolutionMethods)
             selectedIndividuals = List[Individual]
@@ -239,6 +240,7 @@ class GeneticModel(HyperHeuristic):
             print(ind)
         print([xd[1] for xd in self._evaluateGeneration(self._generation, problem)])
         print("------------------------------------------------------")
+        print()
         return generationNum
 
     
