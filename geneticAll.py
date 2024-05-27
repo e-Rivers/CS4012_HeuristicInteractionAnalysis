@@ -285,7 +285,8 @@ class GeneticModel(HyperHeuristic):
                 self._generation = self._evolve_randomSelection(problemInstances, testGroup, thisGeneration_scoredIndividuals)
             
         print(f"HEURISTIC SPACE EXPLORED: ", len(self._heuristicSpaceExplored))
-        print(self._heuristicSpaceExplored)
+        print(type(self._heuristicSpaceExplored))
+        return self._heuristicSpaceExplored
 
         
 

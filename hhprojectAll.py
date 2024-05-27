@@ -65,9 +65,10 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 500
+    heuristicSpaceToExplore = 1000
 
-    hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
+    prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
+    return prueba
 
 # Trains and tests a KNN hyper-heuristic on any of the given problem domains.
 # To test it, uncomment the corresponding code.
@@ -85,7 +86,7 @@ solveHH("KP", "Instances/KP/Test I", hh)
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 3)
-solveHH("Test I", gen)
+prueba = solveHH("Test I", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
 
@@ -104,3 +105,6 @@ hh = KNNHH(features, heuristics, 3)
 hh.train("Instances/FFP/FFP-Training.csv")
 solveHH("FFP", "Instances/FFP/Test I", hh)
 """
+
+###### PININOS
+print(type(prueba))
