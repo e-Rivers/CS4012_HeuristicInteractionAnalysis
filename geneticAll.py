@@ -18,6 +18,7 @@ class GeneticModel(HyperHeuristic):
         self._maxGenerations = maxGenerations
         # Dictionary that keeps the overall evaluation of each specific individual over ALL problem instances
         self._heuristicSpaceExplored : Dict[str, float] = {}
+        self._heuristicSpaceExploredAll : Dict[str, float] = {}
 
     def _initGeneration(self, problemSize : int) -> None:
         random.seed(time.time())
@@ -230,21 +231,40 @@ class GeneticModel(HyperHeuristic):
         for index, row in problemInstances.iterrows():
             problem = BPP(f"{testGroup}/{row['INSTANCE']}")
             oracleValue = row["ORACLE"]
+            instance = row['INSTANCE']
 
             # Gets the score of each individual (how well do they solve the problem)
             individuals_scoresOnONEProblemInstance = self._evaluateOnSingleInstance(individualsMissing, problem)
             
+
             # Store the normalized score of each individual for each problem instance
             for i, indScore in enumerate(individuals_scoresOnONEProblemInstance):
                 individuals_scoresOnALLProblemInstances[index, i] = indScore / oracleValue
             
+        # Initialize an empty list to store the columns
+        columns_list = []
+
+        # Iterate over the columns and append each to the list (to get in each elemnt a list with the results of the instances)
+        for i in range(individuals_scoresOnALLProblemInstances.shape[1]):
+            column = individuals_scoresOnALLProblemInstances[:, i]
+            columns_list.append(column)
+        
+        # Link the individual with all the scores gotten for each instance
+        allScoresIndividuals = [(individualsMissing[i], columns_list[i]) for i in range(len(individualsMissing))]
+        print(allScoresIndividuals)
+
+        #Store in a dictionary the individual and the list of all the scores of all the instances
+        for ind, allScores in allScoresIndividuals:
+            self._heuristicSpaceExploredAll[ind.getGenome()] = allScores
+
         # Get the overall performance of each individual in all the problems
         sumOfScores = np.sum(individuals_scoresOnALLProblemInstances, axis=0)
         avgOfScores = sumOfScores / problemInstances.shape[0]
 
         # Links the scores to their respective individual
         scoredIndividuals = [(individualsMissing[i], avgOfScores[i]) for i in range(len(individualsMissing))]
-        
+        #print(scoredIndividuals)
+
         # Store the newly explored and evaluated individuals scores to avoid redundancy and keep track of the explored heuristic space
         for ind, score in scoredIndividuals:
             self._heuristicSpaceExplored[ind.getGenome()] = score
@@ -285,8 +305,8 @@ class GeneticModel(HyperHeuristic):
                 self._generation = self._evolve_randomSelection(problemInstances, testGroup, thisGeneration_scoredIndividuals)
             
         print(f"HEURISTIC SPACE EXPLORED: ", len(self._heuristicSpaceExplored))
-        print(type(self._heuristicSpaceExplored))
-        return self._heuristicSpaceExplored
+        print("HartaEstoy",len(self._heuristicSpaceExploredAll))
+        return self._heuristicSpaceExplored, self._heuristicSpaceExploredAll
 
         
 

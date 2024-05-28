@@ -5,6 +5,9 @@ from phermes import HyperHeuristic
 import os
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib as plt
+
 
 def characterize(domain : str, folder : str, features : List[str]):
     """
@@ -65,7 +68,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 1000
+    heuristicSpaceToExplore = 1
 
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
@@ -86,7 +89,7 @@ solveHH("KP", "Instances/KP/Test I", hh)
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 3)
-prueba = solveHH("Test I", gen)
+dict1, allScores_allSequences = solveHH("Test I", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
 
@@ -106,5 +109,16 @@ hh.train("Instances/FFP/FFP-Training.csv")
 solveHH("FFP", "Instances/FFP/Test I", hh)
 """
 
-###### PININOS
-print(type(prueba))
+###### ANALYSIS
+
+
+
+# Get the array's values and make a matrix
+matrix_allScores_allSequences = np.vstack(list(allScores_allSequences.values()))
+
+df_allScores_allSequences = pd.DataFrame(matrix_allScores_allSequences, index=allScores_allSequences.keys(), columns=[f'col{i+1}' for i in range(matrix_allScores_allSequences.shape[1])])
+
+print(df_allScores_allSequences)
+
+sns.clustermap(df_allScores_allSequences, z_score=0,cmap='RdYlBu_r')
+plt.show()
