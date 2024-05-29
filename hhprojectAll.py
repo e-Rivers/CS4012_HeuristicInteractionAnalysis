@@ -71,7 +71,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 10000
+    heuristicSpaceToExplore = 20
 
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
@@ -127,6 +127,9 @@ def dendogram_analysis(allScores_allSequences : dict, dict1 : dict, testGroup : 
     matrix_allScores_allSequences = np.vstack(list(allScores_allSequences.values()))
     df_allScores_allSequences = pd.DataFrame(matrix_allScores_allSequences, index=allScores_allSequences.keys(), columns=column_values)
     df_allScores_allSequences.transpose()
+
+    # Rename from sequences to heuristics 01010101 -> "bfit", "bfit"
+    #df_allScores_allSequences.rename(index=lambda x: fromGenToSeq(x, heuristics), inplace=True)
 
     # add the avg score for each sequence to the dataframe in order to sort it
     avg_norm = np.vstack(list(dict1.values()))
