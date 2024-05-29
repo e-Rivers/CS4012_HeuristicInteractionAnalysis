@@ -5,13 +5,8 @@ from phermes import HyperHeuristic
 import os
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from helperFuncs import fromGenToSeq
-from sklearn.cluster import KMeans
-from kneed import KneeLocator
-from sklearn.decomposition import PCA
-from matplotlib.lines import Line2D
+import time
+
 
 
 
@@ -74,7 +69,10 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 100
+    heuristicSpaceToExplore = 50
+
+    with open("time.txt", "w") as file:
+        file.write(str(heuristicSpaceToExplore) + '\n')
 
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
@@ -112,6 +110,8 @@ solveHH("KP", "Instances/KP/Test I", hh)
 """
 
 # For BPP
+start = time.time()
+
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 3)
@@ -120,6 +120,10 @@ dict1, allScores_allSequences = solveHH("Test I", gen)
 #solveHH("Training", gen)
 ##### IMPORTANT, CHANGE THE TEST I IF NEEDED #######
 save_results_csv(allScores_allSequences,dict1, "Test I")
+
+elapsed = time.time() - start
+with open("time.txt", "w") as file:
+        file.write(str(elapsed) + '\n')
 
 
 """
