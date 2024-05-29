@@ -79,6 +79,26 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
 
+def save_results_csv(allScores_allSequences : dict, dict1 : dict, testGroup : str):
+    problemInstances = pd.read_csv(f"BPP-{testGroup}.csv")
+    column_values = problemInstances["INSTANCE"]
+
+    # Generate a dataframe with sequences as rows and instances as columns
+    matrix_allScores_allSequences = np.vstack(list(allScores_allSequences.values()))
+    df_allScores_allSequences = pd.DataFrame(matrix_allScores_allSequences, index=allScores_allSequences.keys(), columns=column_values)
+    df_allScores_allSequences.transpose()
+
+    # Rename from sequences to heuristics 01010101 -> "bfit", "bfit"
+    #df_allScores_allSequences.rename(index=lambda x: fromGenToSeq(x, heuristics), inplace=True)
+
+    # add the avg score for each sequence to the dataframe in order to sort it
+    avg_norm = np.vstack(list(dict1.values()))
+    df_allScores_allSequences['avg_norm'] = avg_norm
+
+    # sort the dataframe
+    df_sorted = df_allScores_allSequences.sort_values(by='avg_norm', ascending=True)
+    df_sorted.to_csv("df_sequences_instances.csv", index = False)
+
 # Trains and tests a KNN hyper-heuristic on any of the given problem domains.
 # To test it, uncomment the corresponding code.
 
@@ -98,6 +118,9 @@ gen = GeneticModel(features, heuristics, 100, 3)
 dict1, allScores_allSequences = solveHH("Test I", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
+##### IMPORTANT, CHANGE THE TEST I IF NEEDED #######
+save_results_csv(allScores_allSequences,dict1, "Test I")
+
 
 """
 features = ["DENSITY", "MAX_DEG", "MIN_DEG"]
@@ -114,129 +137,4 @@ hh = KNNHH(features, heuristics, 3)
 hh.train("Instances/FFP/FFP-Training.csv")
 solveHH("FFP", "Instances/FFP/Test I", hh)
 """
-######################
-###### ANALYSIS ######
-######################
-
-def clustermap_analysis(df, filename):
-    g = sns.clustermap(df, cmap='RdYlBu_r')
-    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)
-    g.savefig(filename)
-
-def dendogram_analysis(allScores_allSequences : dict, dict1 : dict, testGroup : str):
-    problemInstances = pd.read_csv(f"BPP-{testGroup}.csv")
-    column_values = problemInstances["INSTANCE"]
-
-    # Generate a dataframe with sequences as rows and instances as columns
-    matrix_allScores_allSequences = np.vstack(list(allScores_allSequences.values()))
-    df_allScores_allSequences = pd.DataFrame(matrix_allScores_allSequences, index=allScores_allSequences.keys(), columns=column_values)
-    df_allScores_allSequences.transpose()
-
-    # Rename from sequences to heuristics 01010101 -> "bfit", "bfit"
-    #df_allScores_allSequences.rename(index=lambda x: fromGenToSeq(x, heuristics), inplace=True)
-
-    # add the avg score for each sequence to the dataframe in order to sort it
-    avg_norm = np.vstack(list(dict1.values()))
-    df_allScores_allSequences['avg_norm'] = avg_norm
-
-    # sort the dataframe
-    df_sorted = df_allScores_allSequences.sort_values(by='avg_norm', ascending=True)
-
-    # delete the column, because we are not analysing the average yet
-    df_sorted_without_avg = df_sorted.drop(columns=['avg_norm'])
-
-    # analyze the 30 sequences with BEST and WORST average
-    clustermap_analysis(df_sorted_without_avg.head(30), "30_worst.png")
-    clustermap_analysis(df_sorted_without_avg.tail(30), "30_best.png")
-
-    # calculate standard deviation and visualize the 30 sequences with more variance
-    row_std_dev = df_sorted.std(axis=1)
-    top_30_rows_indices = row_std_dev.nlargest(30).index
-    df_top_30_rows = df_sorted.loc[top_30_rows_indices]  
-    clustermap_analysis(df_top_30_rows, "30_std_dev_more.png")
-
-    # visualize the 30 sequences with less variance
-    bottom_30_rows_indices = row_std_dev.nsmallest(30).index
-    df_bottom_30_rows = df_sorted.loc[bottom_30_rows_indices]
-    clustermap_analysis(df_bottom_30_rows, "30_std_dev_less.png")
-
-    # visualize only the 30 instances with more variance
-    std_dev = df_sorted.std()
-    top_30_columns = std_dev.nlargest(30).index
-    df_top_30 = df_sorted[top_30_columns]
-
-    # visualize only the 30 instances with less variance
-    std_dev = df_sorted.std()
-    bottom_30_columns = std_dev.nsmallest(30).index
-    df_bottom_30 = df_sorted[bottom_30_columns]    
-
-    clustermap_analysis(df_top_30.head(30), "30_worst_30_instances.png")
-    clustermap_analysis(df_top_30.tail(30), "30_best_30_instances.png")
-    clustermap_analysis(df_bottom_30.head(30), "30_worst_30_instances_less.png")
-    clustermap_analysis(df_bottom_30.tail(30), "30_best_30_instances_less.png")
-
-    return df_sorted
-
-def cluster_sequences(df_sequences_instances):
-    # 
-    kmeans_kwargs = {
-     "init": "random",
-     "n_init": 10,
-     "max_iter": 300,
-     "random_state": 0,
-    }
-
-    # A list holds the SSE values for each k
-    sse = []
-    for k in range(5, 20):
-        kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
-        kmeans.fit(df_sequences_instances)
-        sse.append(kmeans.inertia_)
-    
-    kl = KneeLocator(
-        range(1, 11), sse, curve="convex", direction="decreasing"
-    )
-    cluster_number = str(kl.elbow)
-
-    pca = PCA(n_components=2)
-    principalComponents = pca.fit_transform(df)
-    principalDf = pd.DataFrame(data = principalComponents                    
-             , columns = ['pc_1', 'pc_2'])
-    
-    kmeans = KMeans(n_clusters=cluster_number, **kmeans_kwargs)
-    kmeans.fit(df_sequences_instances)
-
-    df_sequences_instances["clusters"] = kmeans.labels_
-    df_target = pd.DataFrame(kmeans.labels_, columns = ['target'])
-    finalDf = pd.concat([principalDf,df_target,df['rating']], axis = 1)
-
-    ## plot pca
-    colors = [
-    'red', 'green', 'blue', 'cyan', 'magenta', 'yellow', 'black', 'white', 'gray', 'orange',
-    'purple', 'pink', 'brown', 'lime', 'olive', 'maroon', 'navy', 'teal', 'aqua', 'silver',
-    'gold', 'beige', 'coral', 'crimson', 'darkblue', 'darkcyan', 'darkgreen', 'darkkhaki', 'darkmagenta', 'darkorange'
-    ]
-    finalDf['c'] = finalDf.target.map({i: colors[i] for i in range(30)})
-
-
-    fig, ax = plt.subplots(1, figsize=(8,8))
-    # plot data
-    plt.scatter(finalDf.pc_1, finalDf.pc_2, c=finalDf.c, alpha = 0.6, s=10)
-        # create a list of legend elemntes
-
-
-    ## markers / records
-    legend_elements = [Line2D([0], [0], marker='o', color='w', label='Cluster {}'.format(i),
-               markerfacecolor=mcolor, markersize=5) for i, mcolor in enumerate(colors)]
-    # plot legend
-    plt.legend(handles=legend_elements, loc='upper right')
-    # title and labels
-    plt.title('PCA 2D\n', loc='left', fontsize=22)
-    plt.xlabel('PC_1')
-    plt.ylabel('PC_2')
-    plt.show()
-
-df_sequences_instances = dendogram_analysis(allScores_allSequences,dict1, "Test I")
-cluster_sequences(df_sequences_instances)
-
 

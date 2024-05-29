@@ -1,14 +1,23 @@
 ######################
 ###### ANALYSIS ######
 ######################
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from helperFuncs import fromGenToSeq
+from sklearn.cluster import KMeans
+from kneed import KneeLocator
+from sklearn.decomposition import PCA
+from matplotlib.lines import Line2D
+
 
 def clustermap_analysis(df, filename):
     g = sns.clustermap(df, cmap='RdYlBu_r')
     g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)
     g.savefig(filename)
 
-def dendogram_analysis(allScores_allSequences : dict, dict1 : dict, testGroup : str):
-    
+def dendogram_analysis(df_sorted):
 
     # delete the column, because we are not analysing the average yet
     df_sorted_without_avg = df_sorted.drop(columns=['avg_norm'])
@@ -43,7 +52,6 @@ def dendogram_analysis(allScores_allSequences : dict, dict1 : dict, testGroup : 
     clustermap_analysis(df_bottom_30.head(30), "30_worst_30_instances_less.png")
     clustermap_analysis(df_bottom_30.tail(30), "30_best_30_instances_less.png")
 
-    return df_sorted
 
 def cluster_sequences(df_sequences_instances):
     # 
@@ -61,6 +69,7 @@ def cluster_sequences(df_sequences_instances):
         kmeans.fit(df_sequences_instances)
         sse.append(kmeans.inertia_)
     
+    #Select the number of clusters
     kl = KneeLocator(
         range(1, 20), sse, curve="convex", direction="decreasing"
     )
@@ -71,6 +80,8 @@ def cluster_sequences(df_sequences_instances):
     principalDf = pd.DataFrame(data = principalComponents                    
              , columns = ['pc_1', 'pc_2'])
     
+    # clustering using k-means
+
     kmeans = KMeans(n_clusters=cluster_number, **kmeans_kwargs)
     kmeans.fit(df_sequences_instances)
 
@@ -103,14 +114,16 @@ def cluster_sequences(df_sequences_instances):
     #legend_elements = [Line2D([0], [0], marker='o', color='w', label='Cluster {}'.format(i),
     #           markerfacecolor=mcolor, markersize=5) for i, mcolor in enumerate(colors)]
     # plot legend
-    plt.legend(handles=legend_elements, loc='upper right')
+    #plt.legend(handles=legend_elements, loc='upper right')
     # title and labels
     plt.title('PCA 2D\n', loc='left', fontsize=22)
     plt.xlabel('PC_1')
     plt.ylabel('PC_2')
-    
 
-df_sequences_instances = dendogram_analysis(allScores_allSequences,dict1, "Test I")
+    df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
+    
+df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
+dendogram_analysis(df_sequences_instances)
 cluster_sequences(df_sequences_instances)
 
 
