@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 from helperFuncs import fromGenToSeq
 
 
-
-
 def characterize(domain : str, folder : str, features : List[str]):
     """
       Characterizes the instances contained in a folder.
@@ -71,7 +69,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 20
+    heuristicSpaceToExplore = 100000
 
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
