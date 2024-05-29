@@ -8,6 +8,11 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from helperFuncs import fromGenToSeq
+from sklearn.cluster import KMeans
+from kneed import KneeLocator
+from sklearn.decomposition import PCA
+from matplotlib.lines import Line2D
+
 
 
 def characterize(domain : str, folder : str, features : List[str]):
@@ -69,7 +74,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 100000
+    heuristicSpaceToExplore = 100
 
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
@@ -109,8 +114,9 @@ hh = KNNHH(features, heuristics, 3)
 hh.train("Instances/FFP/FFP-Training.csv")
 solveHH("FFP", "Instances/FFP/Test I", hh)
 """
-
+######################
 ###### ANALYSIS ######
+######################
 
 def clustermap_analysis(df, filename):
     g = sns.clustermap(df, cmap='RdYlBu_r')
@@ -169,9 +175,68 @@ def dendogram_analysis(allScores_allSequences : dict, dict1 : dict, testGroup : 
     clustermap_analysis(df_bottom_30.head(30), "30_worst_30_instances_less.png")
     clustermap_analysis(df_bottom_30.tail(30), "30_best_30_instances_less.png")
 
+    return df_sorted
 
-dendogram_analysis(allScores_allSequences,dict1, "Test I")
+def cluster_sequences(df_sequences_instances):
+    # 
+    kmeans_kwargs = {
+     "init": "random",
+     "n_init": 10,
+     "max_iter": 300,
+     "random_state": 0,
+    }
+
+    # A list holds the SSE values for each k
+    sse = []
+    for k in range(5, 20):
+        kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
+        kmeans.fit(df_sequences_instances)
+        sse.append(kmeans.inertia_)
+    
+    kl = KneeLocator(
+        range(1, 11), sse, curve="convex", direction="decreasing"
+    )
+    cluster_number = str(kl.elbow)
+
+    pca = PCA(n_components=2)
+    principalComponents = pca.fit_transform(df)
+    principalDf = pd.DataFrame(data = principalComponents                    
+             , columns = ['pc_1', 'pc_2'])
+    
+    kmeans = KMeans(n_clusters=cluster_number, **kmeans_kwargs)
+    kmeans.fit(df_sequences_instances)
+
+    df_sequences_instances["clusters"] = kmeans.labels_
+    df_target = pd.DataFrame(kmeans.labels_, columns = ['target'])
+    finalDf = pd.concat([principalDf,df_target,df['rating']], axis = 1)
+
+    ## plot pca
+    colors = [
+    'red', 'green', 'blue', 'cyan', 'magenta', 'yellow', 'black', 'white', 'gray', 'orange',
+    'purple', 'pink', 'brown', 'lime', 'olive', 'maroon', 'navy', 'teal', 'aqua', 'silver',
+    'gold', 'beige', 'coral', 'crimson', 'darkblue', 'darkcyan', 'darkgreen', 'darkkhaki', 'darkmagenta', 'darkorange'
+    ]
+    finalDf['c'] = finalDf.target.map({i: colors[i] for i in range(30)})
 
 
+    fig, ax = plt.subplots(1, figsize=(8,8))
+    # plot data
+    plt.scatter(finalDf.pc_1, finalDf.pc_2, c=finalDf.c, alpha = 0.6, s=10)
+        # create a list of legend elemntes
+
+
+    ## markers / records
+    legend_elements = [Line2D([0], [0], marker='o', color='w', label='Cluster {}'.format(i),
+               markerfacecolor=mcolor, markersize=5) for i, mcolor in enumerate(colors)]
+    # plot legend
+    plt.legend(handles=legend_elements, loc='upper right')
+    # title and labels
+    plt.title('PCA 2D\n', loc='left', fontsize=22)
+    plt.xlabel('PC_1')
+    plt.ylabel('PC_2')
+    plt.show()
+
+df_sequences_instances = dendogram_analysis(allScores_allSequences,dict1, "Test I")
+cluster_sequences(df_sequences_instances)
 
 
