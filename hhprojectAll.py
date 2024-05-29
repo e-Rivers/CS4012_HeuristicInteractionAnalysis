@@ -71,7 +71,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 60
+    heuristicSpaceToExplore = 10000
 
     prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
@@ -112,125 +112,61 @@ hh.train("Instances/FFP/FFP-Training.csv")
 solveHH("FFP", "Instances/FFP/Test I", hh)
 """
 
-###### ANALYSIS
+###### ANALYSIS ######
+
+def clustermap_analysis(df, filename):
+    g = sns.clustermap(df, cmap='RdYlBu_r')
+    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)
+    g.savefig(filename)
 
 def dendogram_analysis(allScores_allSequences : dict, dict1 : dict, testGroup : str):
     problemInstances = pd.read_csv(f"BPP-{testGroup}.csv")
     column_values = problemInstances["INSTANCE"]
 
-    
-    # Get the array's values and make a matrix of sequences vs instances
+    # Generate a dataframe with sequences as rows and instances as columns
     matrix_allScores_allSequences = np.vstack(list(allScores_allSequences.values()))
-
-    # Create a dataframe 
     df_allScores_allSequences = pd.DataFrame(matrix_allScores_allSequences, index=allScores_allSequences.keys(), columns=column_values)
-
-    # Rotate the dataframe in order to have the instances in the columns
     df_allScores_allSequences.transpose()
-    
-    # Rename from sequences to heuristics 01010101 -> "bfit", "bfit"
-    #df_allScores_allSequences.rename(index=lambda x: fromGenToSeq(x, heuristics), inplace=True)
 
-    # Get the values of the average of the evaluation of each sequence
+    # add the avg score for each sequence to the dataframe in order to sort it
     avg_norm = np.vstack(list(dict1.values()))
-
-    # Update the dataframe with the average of the evaluation of each sequence
     df_allScores_allSequences['avg_norm'] = avg_norm
 
-    ########### ANALYZING THE TOP 30 SEQUENCES WITH THE WORST PERFORMANCE ###########
-    
-    # Sort the dataframe
+    # sort the dataframe
     df_sorted = df_allScores_allSequences.sort_values(by='avg_norm', ascending=True)
-    
-    #Delete the column with the average of the evaluation of each sequence
-    df_sorted = df_sorted.drop(columns=['avg_norm'])
 
-    # Create the clustermap with a larger figure size and specific aspect ratio
-    g = sns.clustermap(df_sorted.head(30), cmap='RdYlBu_r')
+    # delete the column, because we are not analysing the average yet
+    df_sorted_without_avg = df_sorted.drop(columns=['avg_norm'])
 
-    # Adjust the y-axis label size
-    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)  # Set the y-axis labels font size
+    # analyze the 30 sequences with BEST and WORST average
+    clustermap_analysis(df_sorted_without_avg.head(30), "30_worst.png")
+    clustermap_analysis(df_sorted_without_avg.tail(30), "30_best.png")
 
-    g.savefig("30_worst.png")
-
-    ########### ANALYZING THE TOP 30 SEQUENCES WITH THE BEST PERFORMANCE ###########
-
-    # Create the clustermap with a larger figure size and specific aspect ratio
-    h = sns.clustermap(df_sorted.tail(30), cmap='RdYlBu_r')
-
-    # Adjust the y-axis label size
-    h.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)  # Set the y-axis labels font size
-
-    h.savefig("30_best.png")
-
-    ########### ANALYZING THE TOP 30 SEQUENCES WITH MORE VARIANCE ###########
-    # Calculate the standard deviation for each row
+    # calculate standard deviation and visualize the 30 sequences with more variance
     row_std_dev = df_sorted.std(axis=1)
-
-    # Select the top 30 rows with the highest standard deviation
     top_30_rows_indices = row_std_dev.nlargest(30).index
-
-    # Create a new DataFrame containing only the top 30 rows
     df_top_30_rows = df_sorted.loc[top_30_rows_indices]  
+    clustermap_analysis(df_top_30_rows, "30_std_dev_more.png")
 
-    # Create the clustermap with a larger figure size and specific aspect ratio
-    k = sns.clustermap(df_top_30_rows, cmap='RdYlBu_r')
-
-    # Adjust the y-axis label size
-    k.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)  # Set the y-axis labels font size
-
-    k.savefig("30_std_dev_more.png")
-
-    ### with LESS standar deviation
-
+    # visualize the 30 sequences with less variance
     bottom_30_rows_indices = row_std_dev.nsmallest(30).index
-
-    # Create a new DataFrame containing only the bottom 30 rows
     df_bottom_30_rows = df_sorted.loc[bottom_30_rows_indices]
+    clustermap_analysis(df_bottom_30_rows, "30_std_dev_less.png")
 
-    # Create the clustermap with a larger figure size and specific aspect ratio
-    m = sns.clustermap(df_bottom_30_rows, cmap='RdYlBu_r')
-
-    # Adjust the y-axis label size
-    m.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)  # Set the y-axis labels font size
-
-    m.savefig("30_std_dev_less.png")
-
-    ##################################################
-    ##### SELECTING THE 30 INSTANCES WITH MORE CHANGES
-
+    # visualize only the 30 instances with more variance
     std_dev = df_sorted.std()
-
-    # Select the top 30 columns with the greatest standard deviation
     top_30_columns = std_dev.nlargest(30).index
-
-    # Create a new DataFrame containing only the top 30 columns
     df_top_30 = df_sorted[top_30_columns]
 
-    ########### ANALYZING THE TOP 30 SEQUENCES WITH THE WORST PERFORMANCE ###########
-    
+    # visualize only the 30 instances with less variance
+    std_dev = df_sorted.std()
+    bottom_30_columns = std_dev.nsmallest(30).index
+    df_bottom_30 = df_sorted[bottom_30_columns]    
 
-    # Create the clustermap with a larger figure size and specific aspect ratio
-    i = sns.clustermap(df_top_30.head(30), cmap='RdYlBu_r')
-
-    # Adjust the y-axis label size
-    i.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)  # Set the y-axis labels font size
-
-    i.savefig("30_worst_30_instances.png")
-
-     ########### ANALYZING THE TOP 30 SEQUENCES WITH THE BEST PERFORMANCE ###########
-    
-
-    # Create the clustermap with a larger figure size and specific aspect ratio
-    j = sns.clustermap(df_top_30.tail(30), cmap='RdYlBu_r')
-
-    # Adjust the y-axis label size
-    j.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)  # Set the y-axis labels font size
-
-    j.savefig("30_best_30_instances.png")
-
-
-
+    clustermap_analysis(df_top_30.head(30), "30_worst_30_instances.png")
+    clustermap_analysis(df_top_30.tail(30), "30_best_30_instances.png")
+    clustermap_analysis(df_bottom_30.head(30), "30_worst_30_instances_less.png")
+    clustermap_analysis(df_bottom_30.tail(30), "30_best_30_instances_less.png")
 
 
 dendogram_analysis(allScores_allSequences,dict1, "Test I")
