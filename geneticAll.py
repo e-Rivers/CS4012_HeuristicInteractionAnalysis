@@ -247,23 +247,28 @@ class GeneticModel(HyperHeuristic):
         # Iterate over the columns and append each to the list (to get in each elemnt a list with the results of the instances)
         for i in range(individuals_scoresOnALLProblemInstances.shape[1]):
             column = individuals_scoresOnALLProblemInstances[:, i]
+            #print(len(column))
             columns_list.append(column)
         
+
         # Link the individual with all the scores gotten for each instance
         allScoresIndividuals = [(individualsMissing[i], columns_list[i]) for i in range(len(individualsMissing))]
-        print(allScoresIndividuals)
+        #print(len(columns_list))
 
         #Store in a dictionary the individual and the list of all the scores of all the instances
         for ind, allScores in allScoresIndividuals:
             self._heuristicSpaceExploredAll[ind.getGenome()] = allScores
+        
+        
 
         # Get the overall performance of each individual in all the problems
         sumOfScores = np.sum(individuals_scoresOnALLProblemInstances, axis=0)
         avgOfScores = sumOfScores / problemInstances.shape[0]
+        #print(problemInstances.shape[0])
 
         # Links the scores to their respective individual
         scoredIndividuals = [(individualsMissing[i], avgOfScores[i]) for i in range(len(individualsMissing))]
-        #print(scoredIndividuals)
+        #print(individuals_scoresOnALLProblemInstances.shape)
 
         # Store the newly explored and evaluated individuals scores to avoid redundancy and keep track of the explored heuristic space
         for ind, score in scoredIndividuals:
