@@ -69,7 +69,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 50
+    heuristicSpaceToExplore = 100
 
     with open("time.txt", "w") as file:
         file.write(str(heuristicSpaceToExplore) + '\n')
@@ -95,7 +95,11 @@ def save_results_csv(allScores_allSequences : dict, dict1 : dict, testGroup : st
 
     # sort the dataframe
     df_sorted = df_allScores_allSequences.sort_values(by='avg_norm', ascending=True)
-    df_sorted.to_csv("df_sequences_instances.csv", index = False)
+    df_sorted.to_csv("df_sequences_instances.csv", index = True)
+    
+    row_names_df = pd.DataFrame(df_sorted.index, columns=['Row Names'])
+    row_names_df.to_csv("index_sequences.csv", index=False)
+
 
 # Trains and tests a KNN hyper-heuristic on any of the given problem domains.
 # To test it, uncomment the corresponding code.

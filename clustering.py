@@ -13,7 +13,8 @@ from matplotlib.lines import Line2D
 
 
 def clustermap_analysis(df, filename):
-    g = sns.clustermap(df, cmap='RdYlBu_r')
+
+    g = sns.clustermap(df, cmap = "RdYlBu_r")
     g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)
     g.savefig(filename)
 
@@ -21,31 +22,34 @@ def dendogram_analysis(df_sorted):
 
     # delete the column, because we are not analysing the average yet
     df_sorted_without_avg = df_sorted.drop(columns=['avg_norm'])
+    df_sorted_without_avg = df_sorted.drop(columns=['Unnamed: 0'])
 
     # analyze the 30 sequences with BEST and WORST average
     clustermap_analysis(df_sorted_without_avg.head(30), "30_worst.png")
     clustermap_analysis(df_sorted_without_avg.tail(30), "30_best.png")
 
+    print(df_sequences_instances)
+
     # calculate standard deviation and visualize the 30 sequences with more variance
-    row_std_dev = df_sorted.std(axis=1)
+    row_std_dev = df_sorted_without_avg.std(axis=1)
     top_30_rows_indices = row_std_dev.nlargest(30).index
-    df_top_30_rows = df_sorted.loc[top_30_rows_indices]  
+    df_top_30_rows = df_sorted_without_avg.loc[top_30_rows_indices]  
     clustermap_analysis(df_top_30_rows, "30_std_dev_more.png")
 
     # visualize the 30 sequences with less variance
     bottom_30_rows_indices = row_std_dev.nsmallest(30).index
-    df_bottom_30_rows = df_sorted.loc[bottom_30_rows_indices]
+    df_bottom_30_rows = df_sorted_without_avg.loc[bottom_30_rows_indices]
     clustermap_analysis(df_bottom_30_rows, "30_std_dev_less.png")
 
     # visualize only the 30 instances with more variance
-    std_dev = df_sorted.std()
+    std_dev = df_sorted_without_avg.std()
     top_30_columns = std_dev.nlargest(30).index
-    df_top_30 = df_sorted[top_30_columns]
+    df_top_30 = df_sorted_without_avg[top_30_columns]
 
     # visualize only the 30 instances with less variance
-    std_dev = df_sorted.std()
+    std_dev = df_sorted_without_avg.std()
     bottom_30_columns = std_dev.nsmallest(30).index
-    df_bottom_30 = df_sorted[bottom_30_columns]    
+    df_bottom_30 = df_sorted_without_avg[bottom_30_columns]    
 
     clustermap_analysis(df_top_30.head(30), "30_worst_30_instances.png")
     clustermap_analysis(df_top_30.tail(30), "30_best_30_instances.png")
@@ -55,6 +59,8 @@ def dendogram_analysis(df_sorted):
 
 def cluster_sequences(df_sequences_instances):
     # 
+    df_sequences_instances = df_sequences_instances.drop(columns=['avg_norm'])
+
     kmeans_kwargs = {
      "init": "random",
      "n_init": 10,
@@ -123,7 +129,8 @@ def cluster_sequences(df_sequences_instances):
     df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
     
 df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
-dendogram_analysis(df_sequences_instances)
 cluster_sequences(df_sequences_instances)
+
+dendogram_analysis(df_sequences_instances)
 
 
