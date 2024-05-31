@@ -27,8 +27,17 @@ def clustermap_analysis(df, filename):
 def dendogram_analysis(df_sorted):
 
     # delete the column, because we are not analysing the average yet
+    print(df_sorted)
     df_sorted_without_avg = df_sorted.drop(columns=['avg_norm'])
-    df_sorted_without_avg = df_sorted.drop(columns=['Unnamed: 0'])
+    df_sorted_without_avg = df_sorted_without_avg.drop(columns=['Unnamed: 0'])
+
+    pattern = r'Hard([A-Z]{2,3})_.*?(\d{3})\.bpp'
+
+    # Use the str.extract method to apply the pattern to the column names
+    new_columns = df_sorted_without_avg.columns.str.extract(pattern)
+
+    # Combine the extracted parts to form the new column names
+    df_sorted_without_avg.columns = new_columns[0] + '_' + new_columns[1]
 
     # analyze the 30 sequences with BEST and WORST average
     clustermap_analysis(df_sorted_without_avg.head(30), "30_worst.png")
@@ -119,15 +128,6 @@ def cluster_sequences(df_sequences_instances):
     fig, ax = plt.subplots(1, figsize=(8,8))
     # plot data
     plt.scatter(finalDf.pc_1, finalDf.pc_2, c=finalDf.c, alpha = 0.6, s=10)
-        # create a list of legend elemntes
-
-
-    ## markers / records
-    #legend_elements = [Line2D([0], [0], marker='o', color='w', label='Cluster {}'.format(i),
-    #           markerfacecolor=mcolor, markersize=5) for i, mcolor in enumerate(colors)]
-    # plot legend
-    #plt.legend(handles=legend_elements, loc='upper right')
-    # title and labels
     plt.title('PCA 2D\n', loc='left', fontsize=22)
     plt.xlabel('PC_1')
     plt.ylabel('PC_2')
@@ -135,7 +135,7 @@ def cluster_sequences(df_sequences_instances):
     df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
     
 df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
-cluster_sequences(df_sequences_instances)
+#cluster_sequences(df_sequences_instances)
 
 dendogram_analysis(df_sequences_instances)
 
