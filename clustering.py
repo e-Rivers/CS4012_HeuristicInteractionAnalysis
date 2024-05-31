@@ -10,13 +10,19 @@ from sklearn.cluster import KMeans
 from kneed import KneeLocator
 from sklearn.decomposition import PCA
 from matplotlib.lines import Line2D
+import os
 
 
 def clustermap_analysis(df, filename):
 
     g = sns.clustermap(df, cmap = "RdYlBu_r")
+    y_labels = g.dendrogram_row.reordered_ind
+    y_labels_df = pd.DataFrame({'y_labels': [df.index[i] for i in y_labels]})
+    
     g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)
     g.savefig(filename)
+    y_labels_df.to_csv(os.path.join('labels', f'y_ls_{filename[:-4]}.csv'))
+    
 
 def dendogram_analysis(df_sorted):
 
