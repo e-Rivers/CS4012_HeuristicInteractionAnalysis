@@ -135,6 +135,7 @@ def cluster_sequences(df_sequences_instances):
     df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
     
 df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
+
 #cluster_sequences(df_sequences_instances)
 
 dendogram_analysis(df_sequences_instances)
