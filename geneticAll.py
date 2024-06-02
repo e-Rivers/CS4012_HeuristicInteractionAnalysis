@@ -208,17 +208,17 @@ class GeneticModel(HyperHeuristic):
     """
     def _evaluateOnSingleInstance(self, thisGeneration : List[Individual], problem : Problem) -> List[float]:
         generationScores = []
-        #binUsageStats = []
+        binUsageStats = []
 
         # Gets the score for each individual
         for individual in thisGeneration:
             problem.solveHH(fromGenToSeq(individual.getGenome(), self._heuristics))
             generationScores.append(problem.getObjValue())
-            #binUsageStats.append(problem.getBinStats())
+            binUsageStats.append(problem.getBinStats())
             problem.reset()
 
         # Sorts the individuals based on their score
-        return generationScores#, binUsageStats
+        return generationScores, binUsageStats
     
     """
     This method is for evaluating a list of individuals against MULTIPLE problem instances
@@ -232,7 +232,7 @@ class GeneticModel(HyperHeuristic):
         individuals_scoresOnALLProblemInstances = np.zeros((problemInstances.shape[0], len(individualsMissing)))
 
         # Creates the space where the bin usage of each (missing to be evaluated) individual for each problem instance will be stored
-        #individuals_binUsageOnALLProblemInstances = np.zeros((problemInstances.shape[0], len(individualsMissing)*2))
+        individuals_binUsageOnALLProblemInstances = np.zeros((problemInstances.shape[0], len(individualsMissing)*2))
 
         # ITERATES ON ALL PROBLEM INSTANCES
         for index, row in problemInstances.iterrows():
@@ -241,9 +241,9 @@ class GeneticModel(HyperHeuristic):
             instance = row['INSTANCE']
 
             # Gets the score of each individual (how well do they solve the problem)
-            individuals_scoresOnONEProblemInstance = self._evaluateOnSingleInstance(individualsMissing, problem)
-            #individuals_scoresOnONEProblemInstance, individuals_binUsageOnONEProblemInstance = \
-            #    self._evaluateOnSingleInstance(individualsMissing, problem)
+            #individuals_scoresOnONEProblemInstance = self._evaluateOnSingleInstance(individualsMissing, problem)
+            individuals_scoresOnONEProblemInstance, individuals_binUsageOnONEProblemInstance = \
+                self._evaluateOnSingleInstance(individualsMissing, problem)
             
 
             # Store the normalized score of each individual for each problem instance
@@ -251,11 +251,11 @@ class GeneticModel(HyperHeuristic):
                 individuals_scoresOnALLProblemInstances[index, i] = indScore / oracleValue
             
             # Store the bin usage of each individual for each problem instance
-            #for i, indBinUsg in enumerate(individuals_binUsageOnONEProblemInstance):
-            #    # Store the bins that were left open
-            #    individuals_binUsageOnALLProblemInstances[index, i*2] = indBinUsg[0]
-            #    # Store the bins that closed
-            #    individuals_binUsageOnALLProblemInstances[index, i*2+1] = indBinUsg[1]
+            for i, indBinUsg in enumerate(individuals_binUsageOnONEProblemInstance):
+                # Store the bins that were left open
+                individuals_binUsageOnALLProblemInstances[index, i*2] = indBinUsg[0]
+                # Store the bins that closed
+                individuals_binUsageOnALLProblemInstances[index, i*2+1] = indBinUsg[1]
             
         # Initialize an empty list to store the columns
         columns_list = []
@@ -275,7 +275,7 @@ class GeneticModel(HyperHeuristic):
         for ind, allScores in allScoresIndividuals:
             self._heuristicSpaceExploredAll[ind.getGenome()] = allScores
         
-        # ######################### SCORES
+        # ------------------------- SCORES
         # Get the overall performance of each individual in all the problems
         sumOfScores = np.sum(individuals_scoresOnALLProblemInstances, axis=0)
         avgOfScores = sumOfScores / problemInstances.shape[0]
@@ -289,18 +289,17 @@ class GeneticModel(HyperHeuristic):
         for ind, score in scoredIndividuals:
             self._heuristicSpaceExplored[ind.getGenome()] = score
 
-        # ######################### BIN USAGE
-        ## Get the overall bin usage of each individual in all the problems
-        #sumOfBinUsage = np.sum(individuals_binUsageOnALLProblemInstances, axis=0)
-        #avgOfBinUsage = sumOfBinUsage / problemInstances.shape[0]
-        #
-        ## Links the bin usages to their respective individual
-        #binUsageIndividuals = [(individualsMissing[i], avgOfBinUsage[i*2], avgOfBinUsage[i*2+1]) for i in range(len(individualsMissing))]
+        # ------------------------- BIN USAGE
+        # Get the overall bin usage of each individual in all the problems
+        sumOfBinUsage = np.sum(individuals_binUsageOnALLProblemInstances, axis=0)
+        avgOfBinUsage = sumOfBinUsage / problemInstances.shape[0]
+        
+        # Links the bin usages to their respective individual
+        binUsageIndividuals = [(individualsMissing[i], avgOfBinUsage[i*2], avgOfBinUsage[i*2+1]) for i in range(len(individualsMissing))]
 
-        ## Store the newly explored and evaluated individuals scores to avoid redundancy and keep track of the explored heuristic space
-        #for ind, openedBins, closedBins in binUsageIndividuals:
-        #    #self._heuristicSpaceExploredBins[ind.getGenome()] = (round(openedBins), round(closedBins)) 
-        #    self._heuristicSpaceExploredBins[ind.getGenome()] = (openedBins, closedBins) 
+        # Store the newly explored and evaluated individuals scores to avoid redundancy and keep track of the explored heuristic space
+        for ind, openedBins, closedBins in binUsageIndividuals:
+            self._heuristicSpaceExploredBins[ind.getGenome()] = (openedBins, closedBins) 
 
         ########################################
         # Adds the already evaluated individuals
@@ -346,7 +345,7 @@ class GeneticModel(HyperHeuristic):
         #print(f"AVG of AVG of opened bins: {sum(openedBins)/len(openedBins)}")
         #print(f"AVG of AVG of closed bins: {sum(closedBins)/len(closedBins)}")
 
-        return self._heuristicSpaceExplored, self._heuristicSpaceExploredAll
+        return self._heuristicSpaceExplored, self._heuristicSpaceExploredAll, self._heuristicSpaceExploredBins
 
 
 

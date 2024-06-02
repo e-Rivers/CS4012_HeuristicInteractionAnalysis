@@ -105,11 +105,11 @@ start = time.time()
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 5)
-dict1, allScores_allSequences = solveHH("Test I", gen)
+dict1, allScores_allSequences, avgBins = solveHH("Test I", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
 ##### IMPORTANT, CHANGE THE TEST I IF NEEDED #######
-save_results_csv(allScores_allSequences,dict1, "Test II")
+save_results_csv(allScores_allSequences,dict1, "Test I")
 
 elapsed = time.time() - start
 with open("time.txt", "w") as file:
