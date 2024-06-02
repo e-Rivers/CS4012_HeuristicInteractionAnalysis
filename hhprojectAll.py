@@ -1,6 +1,6 @@
 from geneticAll import GeneticModel
 from bpp import BPP
-from typing import List
+from typing import List, Dict, Tuple
 from phermes import HyperHeuristic
 import os
 import pandas as pd
@@ -66,7 +66,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 10_000
+    heuristicSpaceToExplore = 100
 
     with open("time.txt", "w") as file:
         file.write(str(heuristicSpaceToExplore) + '\n')
@@ -75,7 +75,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     #prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
 
-def save_results_csv(allScores_allSequences : dict, dict1 : dict, testGroup : str):
+def save_results_csv(allScores_allSequences : dict, dict1 : dict, binUsage : Dict[str, Tuple[float, float]], testGroup : str):
     problemInstances = pd.read_csv(f"BPP-{testGroup}.csv")
     column_values = problemInstances["INSTANCE"]
 
@@ -86,6 +86,14 @@ def save_results_csv(allScores_allSequences : dict, dict1 : dict, testGroup : st
 
     # Rename from sequences to heuristics 01010101 -> "bfit", "bfit"
     #df_allScores_allSequences.rename(index=lambda x: fromGenToSeq(x, heuristics), inplace=True)
+
+
+    # Add the opened/closed bin avg
+    binUsageStats = np.vstack(list(binUsage.values()))
+    openedBins = np.array([opened for opened, _ in binUsageStats])
+    closedBins = np.array([closed for _, closed in binUsageStats])
+    df_allScores_allSequences["opened_bins"] = openedBins
+    df_allScores_allSequences["closed_bins"] = closedBins 
 
     # add the avg score for each sequence to the dataframe in order to sort it
     avg_norm = np.vstack(list(dict1.values()))
@@ -105,11 +113,11 @@ start = time.time()
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 5)
-dict1, allScores_allSequences, avgBins = solveHH("Test I", gen)
+dict1, allScores_allSequences, avgBins = solveHH("Test II", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
 ##### IMPORTANT, CHANGE THE TEST I IF NEEDED #######
-save_results_csv(allScores_allSequences,dict1, "Test I")
+save_results_csv(allScores_allSequences,dict1, avgBins, "Test II")
 
 elapsed = time.time() - start
 with open("time.txt", "w") as file:
