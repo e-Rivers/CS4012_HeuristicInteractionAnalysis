@@ -7,9 +7,6 @@ import pandas as pd
 import numpy as np
 import time
 
-
-
-
 def characterize(domain : str, folder : str, features : List[str]):
     """
       Characterizes the instances contained in a folder.
@@ -69,12 +66,13 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 100
+    heuristicSpaceToExplore = 10_000
 
     with open("time.txt", "w") as file:
         file.write(str(heuristicSpaceToExplore) + '\n')
 
-    prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
+    prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore, ["strongest"])
+    #prueba = hyperHeuristic.solveAll(testGroup, heuristicSpaceToExplore)
     return prueba
 
 def save_results_csv(allScores_allSequences : dict, dict1 : dict, testGroup : str):
@@ -101,48 +99,18 @@ def save_results_csv(allScores_allSequences : dict, dict1 : dict, testGroup : st
     row_names_df.to_csv("index_sequences.csv", index=False)
 
 
-# Trains and tests a KNN hyper-heuristic on any of the given problem domains.
-# To test it, uncomment the corresponding code.
-
-"""
-# For KP
-features = ["WEIGHT", "PROFIT", "CORRELATION"]
-heuristics = ["DEF", "MAXP", "MAXPW", "MINW", "MARK"]
-hh = KNNHH(features, heuristics, 3)
-hh.train("Instances/KP/KP-Training.csv")
-solveHH("KP", "Instances/KP/Test I", hh)
-"""
-
 # For BPP
 start = time.time()
 
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
-gen = GeneticModel(features, heuristics, 100, 3)
+gen = GeneticModel(features, heuristics, 100, 5)
 dict1, allScores_allSequences = solveHH("Test I", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
 ##### IMPORTANT, CHANGE THE TEST I IF NEEDED #######
-save_results_csv(allScores_allSequences,dict1, "Test I")
+save_results_csv(allScores_allSequences,dict1, "Test II")
 
 elapsed = time.time() - start
 with open("time.txt", "w") as file:
         file.write(str(elapsed) + '\n')
-
-
-"""
-features = ["DENSITY", "MAX_DEG", "MIN_DEG"]
-heuristics = ["DEF", "DEG", "COL_DEG", "UNCOL_DEG"]
-hh = KNNHH(features, heuristics, 3)
-hh.train("Instances/VCP/VCP-Training.csv")
-solveHH("VCP", "Instances/VCP/Test I", hh)
-"""
-
-"""
-features = ["DENSITY", "MAX_DEG", "MIN_DEG", "COST"]
-heuristics = ["DEF", "DEG", "RISK_DEG"]
-hh = KNNHH(features, heuristics, 3)
-hh.train("Instances/FFP/FFP-Training.csv")
-solveHH("FFP", "Instances/FFP/Test I", hh)
-"""
-

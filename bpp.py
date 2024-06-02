@@ -84,6 +84,9 @@ class BPP (Problem):
 		self._openBins = []
 		self._closedBins = []
 
+	def getBinStats(self):
+		return (len(self._openBins), len(self._closedBins))
+
 	def solve(self, heuristic : str) -> None: 		   
 		while self._items:
 			item = self._items.pop(0)
