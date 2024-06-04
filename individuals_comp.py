@@ -9,6 +9,8 @@ df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
 
 for filename in os.listdir('labels'):
     y_labels_df = pd.read_csv(os.path.join('labels', F"{filename}"))
+
+
     y_labels_series = y_labels_df['y_labels']
 
     bit_series = df_sequences_instances.iloc[y_labels_df['y_labels']]['Unnamed: 0']
@@ -60,7 +62,7 @@ for filename in os.listdir('labels'):
     colorbar.set_ticks([0.375, 1.125, 1.875, 2.625])
     colorbar.set_ticklabels(['FFIT (00)', 'BFIT (01)', 'WFIT (10)', 'AWFIT (11)'])
 
-    plt.title(f"{filename[5:-4]}")
+    #plt.title(f"{filename[5:-4]}")
     plt.xlabel("Heuristic Position")
     plt.ylabel("Bit String id")
     plt.savefig(os.path.join('individuals_comps', f'{filename[5:-4]}.png'), dpi=500.0)
