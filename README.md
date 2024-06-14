@@ -3,7 +3,7 @@
 
 Our first approach was to generate sequences of heuristics tailored for each problem instance individually. The main files for that purpose are:
 
-:warning: _These files were not used for the final approach, but they served to conduct the initial experiments_
+:warning: _These two first files were not used for the final approach, but they served to conduct the initial experiments_
 * ```hhproject.py``` which invokes the Genetic Algorithm (GA) to generate sequences for each instance of the problem.
 * ```genetic.py``` which holds the GA Hyper-Heuristic (HH) to generate the sequences (works by defining a certain number of generations)
 
