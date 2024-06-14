@@ -2,13 +2,17 @@
 Final Project code for exploring the relationship between heuristics using Genetic Algorithms to solve the 1D Bin Packing Problem
 
 
-Our first approach was to evolve the sequence of heuristics to fit each problem instance individually. However, our final approach was to evolve the sequence of heuristics so that it fits the entire dataset of instances being used.
+Our first approach was to generate sequences of heuristics tailored for each problem instance individually. The main files for that purpose are:
+```hhproject.py``` which invokes the Genetic Algorithm (GA) to generate sequences for each instance of the problem.
+```genetic.py``` which holds the GA Hyper-Heuristic (HH) to generate the sequences (works by defining a certain number of generations)
 
-This way, the file ```hhprojectAll.py``` contains our final approach. In this file, there is a function called ```solveHH```, which has the variable ```heuristicSpaceToExplore = 100```. This variable indicates how many sequences will be explored, and that drives the execution time for the algorithm.
+However, we changed to approach to study more general patterns across all instances, as such, the generated sequences were now tested for all instances. This required certain modifications that differed from the original files provided, thus, we created a modified version to make these experiments for ALL problem instances, leaving us with the files:
+```hhprojectAll.py``` which invokes the GA one single time and passes all problem instance of a certain problem set (either Test I or Test II) 
+```geneticAll.py``` contains a modified version of the GA in which the fitness function is tested with all instances of the problems.
 
 Then, to run the project from beginning to end, the steps are the following
 
-1. Decide the amount of search space to cover.
+1. Decide the amount of search space to cover. This variable indicates how many sequences will be explored, and that drives the execution time for the algorithm.
     ```
     In file hhprojectAll.py line 69
     heuristicSpaceToExplore = 100
