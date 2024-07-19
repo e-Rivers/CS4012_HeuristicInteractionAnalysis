@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 import os
 
-df_sequences_instances = pd.read_csv("df_sequences_instances_denisse.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_Exp4.csv")
 print("HOLA")
 
 for filename in os.listdir('labels'):
@@ -59,9 +59,12 @@ for filename in os.listdir('labels'):
     # Manually specify colorbar labelling after it's been generated
     colorbar = ax.collections[0].colorbar
     colorbar.set_ticks([0.375, 1.125, 1.875, 2.625])
+    colorbar.ax.tick_params(labelsize=14)
     colorbar.set_ticklabels(['FFIT', 'BFIT', 'WFIT', 'AWFIT'])
 
     #plt.title(f"{filename[5:-4]}")
-    plt.xlabel("Heuristic Position")
-    plt.ylabel("Bit String id")
+    plt.xlabel("Heuristic Position", fontsize=14)
+    plt.xticks(fontsize=10)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=15, rotation =0)
+    plt.ylabel("Sequence's ID", fontsize=14)
     plt.savefig(os.path.join('individuals_comps', f'{filename[5:-4]}.png'), dpi=500.0)

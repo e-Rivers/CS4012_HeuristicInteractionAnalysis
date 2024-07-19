@@ -15,12 +15,15 @@ import os
 
 def clustermap_analysis(df, filename):
 
-    g = sns.clustermap(df, cmap="RdYlBu_r", cbar_kws={'label': 'Color Scale', 'ticks': [df.min().min(), df.max().max()], 'orientation': 'vertical', 'fontsize': 14})
+    g = sns.clustermap(df, cmap="RdYlBu_r")
     y_labels = g.dendrogram_row.reordered_ind
     y_labels_df = pd.DataFrame({'y_labels': [df.index[i] for i in y_labels]})
     
-    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=19)
+    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=17, rotation=0)
     g.ax_heatmap.set_xticklabels([])  # Remove x-axis labels
+
+    cbar = g.ax_heatmap.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=17)
 
     g.savefig(filename)
     y_labels_df.to_csv(os.path.join('labels', f'y_ls_{filename[:-4]}.csv'))
