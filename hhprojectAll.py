@@ -66,7 +66,7 @@ def solveHH(testGroup : str, hyperHeuristic : HyperHeuristic):
     # WARNING, TAKE EXTREME CAUTION IF YOU WANT TO USE THE REAL HEURISTIC SPACE, IF SO, COMMENT THE LINE BELOW AND MAY GOD HELP YOU... RIP  # 
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! #
-    heuristicSpaceToExplore = 100
+    heuristicSpaceToExplore = 250000
 
     with open("time.txt", "w") as file:
         file.write(str(heuristicSpaceToExplore) + '\n')
@@ -113,11 +113,11 @@ start = time.time()
 features = ["LENGTH", "SMALL", "LARGE"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 gen = GeneticModel(features, heuristics, 100, 5)
-dict1, allScores_allSequences, avgBins = solveHH("Test II", gen)
+dict1, allScores_allSequences, avgBins = solveHH("Test I", gen)
 #solveHH("Test II", gen)
 #solveHH("Training", gen)
 ##### IMPORTANT, CHANGE THE TEST I IF NEEDED #######
-save_results_csv(allScores_allSequences,dict1, avgBins, "Test II")
+save_results_csv(allScores_allSequences,dict1, avgBins, "Test I")
 
 elapsed = time.time() - start
 with open("time.txt", "w") as file:

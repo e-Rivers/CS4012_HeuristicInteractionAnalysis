@@ -28,8 +28,8 @@ def dendogram_analysis(df_sorted):
 
     # delete the column, because we are not analysing the average yet
     print(df_sorted)
-    df_sorted_without_avg = df_sorted.drop(columns=['avg_norm'])
-    df_sorted_without_avg = df_sorted_without_avg.drop(columns=['Unnamed: 0'])
+    df_sorted_without_avg = df_sorted.drop(columns=['avg_norm', 'Unnamed: 0', 'opened_bins', 'closed_bins'])
+    #df_sorted_without_avg = df_sorted.drop(columns=['avg_norm', 'Unnamed: 0'])
 
     pattern = r'Hard([A-Z]{2,3})_.*?(\d{3})\.bpp'
 
@@ -134,7 +134,8 @@ def cluster_sequences(df_sequences_instances):
 
     df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
     
-df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_denisse.csv")
+print("HOLA")
 
 #cluster_sequences(df_sequences_instances)
 

@@ -11,7 +11,11 @@ from statsmodels.formula.api import ols
 
 ##20 DECISIONS
 
+<<<<<<< Updated upstream
 df_sequences_instances = pd.read_csv("df_sequences_instances_Exp3.csv")
+=======
+df_sequences_instances = pd.read_csv("df_sequences_instances_40emilio.csv")
+>>>>>>> Stashed changes
 bit_seq = df_sequences_instances["Unnamed: 0"]
 heuristics = ['FFIT-FFIT', 'FFIT-BFIT', 'FFIT-WFIT','FFIT-AWFIT',
               'BFIT-FFIT', 'BFIT-BFIT', 'BFIT-WFIT','BFIT-AWFIT',
@@ -126,8 +130,13 @@ def perform_tests(choice_column, choice_type):
     
     # Plot the results
     tukey.plot_simultaneous()
+<<<<<<< Updated upstream
     plt.title(f'Tukey HSD Test for avg_norm by {choice_type} ')
     plt.savefig(f'proportions_pairs/Exp3/boxplot_tukey/tukey_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
+=======
+    plt.title(f'Tukey HSD Test for ANBEU by {choice_type} ')
+    plt.savefig(f'proportions_pairs/boxplot_tukey/tukey_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
+>>>>>>> Stashed changes
     
     # Plot the boxplot for visualization with custom colors
     palette = sns.color_palette("Set2")  # Custom colors
@@ -140,7 +149,11 @@ def perform_tests(choice_column, choice_type):
     plt.savefig(f'proportions_pairs/Exp3/boxplot_tukey/Boxplot_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
 
 # Perform tests for choices from 1 to 40/2
+<<<<<<< Updated upstream
 for choice_num in range(1, 11):
+=======
+for choice_num in range(1, 21):
+>>>>>>> Stashed changes
     choice_column = f'choice_{choice_num}'
     choice_type = f'Choice {choice_num}'
     df_sequences_instances[choice_column] = df_sequences_instances["Unnamed: 0"].apply(lambda x: x[choice_num - 1] if len(x) >= choice_num else None)

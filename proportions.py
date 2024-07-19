@@ -11,7 +11,7 @@ from statsmodels.formula.api import ols
 
 ##40 DECISIONS
 
-df_sequences_instances = pd.read_csv("df_sequences_instances.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_40random1.csv")
 bit_seq = df_sequences_instances["Unnamed: 0"]
 heuristics = ["FFIT", "BFIT", "WFIT", "AWFIT"]
 bit_seq_transformed = bit_seq.apply(lambda x: fromGenToSeq(x, heuristics))
