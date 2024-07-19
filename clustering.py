@@ -15,11 +15,13 @@ import os
 
 def clustermap_analysis(df, filename):
 
-    g = sns.clustermap(df, cmap = "RdYlBu_r")
+    g = sns.clustermap(df, cmap="RdYlBu_r", cbar_kws={'label': 'Color Scale', 'ticks': [df.min().min(), df.max().max()], 'orientation': 'vertical', 'fontsize': 14})
     y_labels = g.dendrogram_row.reordered_ind
     y_labels_df = pd.DataFrame({'y_labels': [df.index[i] for i in y_labels]})
     
-    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=6)
+    g.ax_heatmap.set_yticklabels(g.ax_heatmap.get_ymajorticklabels(), fontsize=19)
+    g.ax_heatmap.set_xticklabels([])  # Remove x-axis labels
+
     g.savefig(filename)
     y_labels_df.to_csv(os.path.join('labels', f'y_ls_{filename[:-4]}.csv'))
     
@@ -134,7 +136,7 @@ def cluster_sequences(df_sequences_instances):
 
     df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
     
-df_sequences_instances = pd.read_csv("df_sequences_instances_denisse.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_Exp4.csv")
 print("HOLA")
 
 #cluster_sequences(df_sequences_instances)
