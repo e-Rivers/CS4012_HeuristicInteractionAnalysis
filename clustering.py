@@ -139,7 +139,7 @@ def cluster_sequences(df_sequences_instances):
 
     df_sequences_instances.to_csv("df_sequences_instances_clusters.csv", index = False)
     
-df_sequences_instances = pd.read_csv("df_sequences_instances_Exp4.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_Exp3.csv")
 print("HOLA")
 
 #cluster_sequences(df_sequences_instances)

@@ -41,10 +41,14 @@ for heuristic, color in zip(heuristics, myColors):
     df_sequences_instances[f'proportion_{heuristic}'] = df_sequences_instances["Unnamed: 0"].apply(lambda x: calculate_proportions(x, heuristic))
     plt.figure(figsize=(10, 6))
     plt.scatter(df_sequences_instances[f'proportion_{heuristic}'], df_sequences_instances['avg_norm'], alpha=0.5, color=color)
-    plt.ylabel('Average Normalized Bin Efficiency Usage (ANBEU)')
-    plt.xlabel(f'Proportion of {heuristic}')
-    plt.title("Experiment 1")
+    plt.ylabel( r'$\eta_{avg}$' , fontsize=18)
+    plt.xlabel(f'Proportion of {heuristic}', fontsize=18)
+    plt.xticks(fontsize=21, rotation =70)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=21, rotation =0)
+    #plt.title("Experiment 1")
     plt.grid(True)
+    plt.tight_layout()
+
     plt.savefig(f'proportions20/Exp4/proportion_{heuristic}.png', dpi=300.0)
 
 # Create boxplots for each interval of 0.2 for each heuristic
@@ -52,18 +56,22 @@ for heuristic in heuristics:
     plt.figure(figsize=(10, 6))
     plt.boxplot([df_sequences_instances[df_sequences_instances[f'proportion_category_{heuristic}'] == category]['avg_norm'] for category in df_sequences_instances[f'proportion_category_{heuristic}'].unique()],
                 labels=[round(category, 2) for category in df_sequences_instances[f'proportion_category_{heuristic}'].unique()])
-    plt.ylabel('Average Normalized Bin Efficiency Usage (ANBEU)')
-    plt.xlabel(f'Proportion of {heuristic}')
-    plt.title("Experiment 1")
+    plt.ylabel(' (ANBEU)', fontsize=14)
+    plt.xlabel(f'Proportion of {heuristic}', fontsize=14)
+    plt.xticks(fontsize=16)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=16, rotation =0)
+    #plt.title("Experiment 1")
     plt.grid(True)
     plt.savefig(f'proportions20/Exp4/boxplot_proportion_{heuristic}.png', dpi=300.0)
 
 # Create histograms for each interval of 0.2 for each heuristic
 for heuristic, color in zip(heuristics, myColors):
     ax = df_sequences_instances.hist(column=f'proportion_{heuristic}', color=color)
-    plt.title(f'Experiment 1')
-    plt.xlabel(f'Proportion of {heuristic}')
-    plt.ylabel('Frequency')
+    #plt.title(f'Experiment 1')
+    plt.xlabel(f'Proportion of {heuristic}', fontsize=14)
+    plt.ylabel('Frequency', fontsize=14)
+    plt.xticks(fontsize=16)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=16, rotation =0)
     plt.savefig(f'proportions20/Exp4/histogram_proportion_{heuristic}.png', dpi=300.0)
 
 
@@ -84,9 +92,11 @@ for heuristic, color in zip(heuristics, myColors):
     df_sequences_instances[f'proportion_{heuristic}_last_half'] = df_sequences_instances["Unnamed: 0"].apply(lambda x: calculate_proportions_last_half(x, heuristic))
     plt.figure(figsize=(10, 6))
     plt.scatter(df_sequences_instances[f'proportion_{heuristic}_last_half'], df_sequences_instances['avg_norm'], alpha=0.5, color=color)
-    plt.ylabel('Average Normalized Bin Efficiency Usage (ANBEU)')
-    plt.xlabel(f'Proportion of {heuristic} in the last half')
-    plt.title("Experiment 1")
+    plt.ylabel(' (ANBEU)', fontsize=14)
+    plt.xlabel(f'Proportion of {heuristic} in the last half', fontsize=14)
+    plt.xticks(fontsize=18, rotation= 70)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=18, rotation =0)
+    #plt.title("Experiment 1")
     plt.grid(True)
     plt.savefig(f'proportions20/Exp4/proportion_{heuristic}_last_half.png', dpi=300.0)
 
@@ -94,9 +104,11 @@ for heuristic, color in zip(heuristics, myColors):
 # Create histograms for each interval of 0.2 for each heuristic last half
 for heuristic, color in zip(heuristics, myColors):
     ax = df_sequences_instances.hist(column=f'proportion_{heuristic}_last_half', color=color)
-    plt.title('Experiment 1')
-    plt.xlabel(f'Proportion of {heuristic} in the last half')
-    plt.ylabel('Frequency')
+    #plt.title('Experiment 1')
+    plt.xlabel(f'Proportion of {heuristic} in the last half', fontsize=14)
+    plt.ylabel('Frequency', fontsize=14)
+    plt.xticks(fontsize=16)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=16, rotation =90)
     plt.savefig(f'proportions20/Exp4/histogram_proportion_{heuristic}_lastHalf.png', dpi=300.0)
 
 
@@ -124,15 +136,21 @@ def perform_tests(choice_column, choice_type):
     
     # Plot the results
     tukey.plot_simultaneous()
-    plt.title(f'Tukey HSD Test for avg_norm by {choice_type} ')
+    plt.title(' ')
+    plt.xticks(fontsize=23, rotation=70)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=23, rotation =0)
+    plt.xlabel("Mean for each group (95% CI)", fontsize=21)
+    plt.tight_layout()
     plt.savefig(f'proportions20/Exp4/boxplot_tukey/tukey_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
     
     # Plot the boxplot for visualization with custom colors
     palette = sns.color_palette("Set2")  # Custom colors
     plt.figure(figsize=(10, 6))
     sns.boxplot(x=choice_column, y='avg_norm', data=df_sequences_instances, palette=palette)
-    plt.xlabel(f'{choice_type} ')
-    plt.ylabel('Average Normalized Bin Efficiency Usage (ANBEU)')
+    plt.xlabel(f'{choice_type} ', fontsize=14)
+    plt.ylabel(' (ANBEU)', fontsize=14)
+    plt.xticks(fontsize=20, rotation = 70)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=20, rotation =0)
     plt.title(f'Boxplot of avg_norm by {choice_type} ')
     plt.grid(True)
     plt.savefig(f'proportions20/Exp4/boxplot_tukey/Boxplot_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)

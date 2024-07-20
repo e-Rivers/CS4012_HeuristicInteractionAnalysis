@@ -11,7 +11,7 @@ from statsmodels.formula.api import ols
 
 ##20 DECISIONS
 
-df_sequences_instances = pd.read_csv("df_sequences_instances_40emilio.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_Exp2.csv")
 bit_seq = df_sequences_instances["Unnamed: 0"]
 heuristics = ['FFIT-FFIT', 'FFIT-BFIT', 'FFIT-WFIT','FFIT-AWFIT',
               'BFIT-FFIT', 'BFIT-BFIT', 'BFIT-WFIT','BFIT-AWFIT',
@@ -48,7 +48,7 @@ for heuristic, color in zip(heuristics, myColors):
     plt.xlabel(f'Proportion of {heuristic}')
     plt.title("Average Normalized Efficiency of Space")
     plt.grid(True)
-    plt.savefig(f'proportions_pairs/Exp3/proportion_{heuristic}.png', dpi=300.0)
+    plt.savefig(f'proportions_pairs/Exp2/proportion_{heuristic}.png', dpi=300.0)
 
 # Create boxplots for each interval of 0.2 for each heuristic
 for heuristic in heuristics:
@@ -59,7 +59,7 @@ for heuristic in heuristics:
     plt.xlabel(f'Proportion of {heuristic}')
     plt.title("Average Normalized Efficiency of Space by Proportion Category")
     plt.grid(True)
-    plt.savefig(f'proportions_pairs/Exp3/boxplot_proportion_{heuristic}.png', dpi=300.0)
+    plt.savefig(f'proportions_pairs/Exp2/boxplot_proportion_{heuristic}.png', dpi=300.0)
 
 # Create histograms for each interval of 0.2 for each heuristic
 for heuristic, color in zip(heuristics, myColors):
@@ -67,7 +67,7 @@ for heuristic, color in zip(heuristics, myColors):
     plt.title(f'Histogram of Proportion of {heuristic}')
     plt.xlabel('Proportion of {heuristic}')
     plt.ylabel('Frequency')
-    plt.savefig(f'proportions_pairs/Exp3/histogram_proportion_{heuristic}.png', dpi=300.0)
+    plt.savefig(f'proportions_pairs/Exp2/histogram_proportion_{heuristic}.png', dpi=300.0)
 
 
 
@@ -91,7 +91,7 @@ for heuristic, color in zip(heuristics, myColors):
     plt.xlabel(f'Proportion of {heuristic} in the last half')
     plt.title("Average Normalized Efficiency of Space")
     plt.grid(True)
-    plt.savefig(f'proportions_pairs/Exp3/proportion_{heuristic}_last_half.png', dpi=300.0)
+    plt.savefig(f'proportions_pairs/Exp2/proportion_{heuristic}_last_half.png', dpi=300.0)
 
 
 # Create histograms for each interval of 0.2 for each heuristic last half
@@ -100,7 +100,7 @@ for heuristic, color in zip(heuristics, myColors):
     plt.title(f'Histogram of Proportion of {heuristic} in the last half')
     plt.xlabel('Proportion of {heuristic} in the last half')
     plt.ylabel('Frequency')
-    plt.savefig(f'proportions_pairs/Exp3/histogram_proportion_{heuristic}_lastHalf.png', dpi=300.0)
+    plt.savefig(f'proportions_pairs/Exp2/histogram_proportion_{heuristic}_lastHalf.png', dpi=300.0)
 
 
 
@@ -118,7 +118,7 @@ def perform_tests(choice_column, choice_type):
                               groups=df_sequences_instances[choice_column],
                               alpha=0.01)
     
-    with open('proportions_pairs/Exp3/anova_tukey_pairs_20.txt', 'a') as f:
+    with open('proportions_pairs/Exp2/anova_tukey_pairs_20.txt', 'a') as f:
         f.write(f"ANOVA table for {choice_type} :\n")
         f.write(f"{anova_table}\n\n")
         f.write(f"Tukey HSD test results for {choice_type}:\n")
@@ -126,8 +126,12 @@ def perform_tests(choice_column, choice_type):
     
     # Plot the results
     tukey.plot_simultaneous()
-    plt.title(f'Tukey HSD Test for avg_norm by {choice_type} ')
-    plt.savefig(f'proportions_pairs/Exp3/boxplot_tukey/tukey_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
+    plt.title(' ')
+    plt.xticks(fontsize=22, rotation =70)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=22, rotation =0)
+    plt.xlabel("Mean for each group (95% CI)", fontsize=21)
+    plt.tight_layout()
+    plt.savefig(f'proportions_pairs/Exp2/boxplot_tukey/tukey_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
     
     # Plot the boxplot for visualization with custom colors
     palette = sns.color_palette("Set2")  # Custom colors
@@ -137,10 +141,10 @@ def perform_tests(choice_column, choice_type):
     plt.ylabel('Average Normalized Efficiency Utilized (avg_norm)')
     plt.title(f'Boxplot of avg_norm by {choice_type} ')
     plt.grid(True)
-    plt.savefig(f'proportions_pairs/Exp3/boxplot_tukey/Boxplot_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
+    plt.savefig(f'proportions_pairs/Exp2/boxplot_tukey/Boxplot_of_avg_norm_by_{choice_type}_Choice.png', dpi=300.0)
 
 # Perform tests for choices from 1 to 40/2
-for choice_num in range(1, 11):
+for choice_num in range(1, 21):
     choice_column = f'choice_{choice_num}'
     choice_type = f'Choice {choice_num}'
     df_sequences_instances[choice_column] = df_sequences_instances["Unnamed: 0"].apply(lambda x: x[choice_num - 1] if len(x) >= choice_num else None)

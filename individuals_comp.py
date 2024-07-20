@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.colors import LinearSegmentedColormap
 import os
 
-df_sequences_instances = pd.read_csv("df_sequences_instances_Exp4.csv")
+df_sequences_instances = pd.read_csv("df_sequences_instances_Exp3.csv")
 print("HOLA")
 
 for filename in os.listdir('labels'):
@@ -30,20 +30,20 @@ for filename in os.listdir('labels'):
 
     #print(gene_matrix)
     bgene_matrix = np.full(gene_matrix.shape, fill_value='', dtype='object')
-
+    
     for i in range(gene_matrix.shape[0]):
         bin_str_row = ''
         for ind, val in enumerate(gene_matrix[i]):
             bin_str = bin(int(val))[2:].rjust(2, '0')
             #print(bin_str, i, ind)
             bgene_matrix[i, ind] = bin_str
-            #print(bin_str)
-            
+            #print(bin_str) 
+              
     #print(bit_matrix.shape)
     #print(gene_matrix.shape)
 
     # Plotting the binary matrix
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(12, 11))
     bgene_matrix_df = pd.DataFrame(bgene_matrix)
     #print(bgene_matrix_df)
 
@@ -54,17 +54,24 @@ for filename in os.listdir('labels'):
     ax = sns.heatmap(gene_matrix, 
                 annot=bgene_matrix_df, 
                 xticklabels=range(1, len(gene_matrix[0]) + 1), 
-                yticklabels=list(y_labels_series), fmt='', cmap=cmap)
+                yticklabels=list(y_labels_series), fmt='', cmap=cmap, cbar=False)
 
     # Manually specify colorbar labelling after it's been generated
-    colorbar = ax.collections[0].colorbar
-    colorbar.set_ticks([0.375, 1.125, 1.875, 2.625])
-    colorbar.ax.tick_params(labelsize=14)
-    colorbar.set_ticklabels(['FFIT', 'BFIT', 'WFIT', 'AWFIT'])
+    cbar = ax.figure.colorbar(ax.collections[0], orientation="horizontal", pad=0.15)
+    cbar.set_ticks([0.375, 1.125, 1.875, 2.625])
+    cbar.ax.tick_params(labelsize=16)
+    cbar.set_ticklabels(['FFIT', 'BFIT', 'WFIT', 'AWFIT'])
+
+    #colorbar = ax.collections[0].colorbar(orientation="horizontal", pad=0.2)
+    #colorbar.set_ticks([0.375, 1.125, 1.875, 2.625])
+    #colorbar.ax.tick_params(labelsize=14)
+    #colorbar.set_ticklabels(['FFIT', 'BFIT', 'WFIT', 'AWFIT'])
 
     #plt.title(f"{filename[5:-4]}")
     plt.xlabel("Heuristic Position", fontsize=14)
-    plt.xticks(fontsize=10)  # Aumentar tamaño de las etiquetas del eje x
-    plt.yticks(fontsize=15, rotation =0)
+    plt.xticks(fontsize=16, rotation=70)  # Aumentar tamaño de las etiquetas del eje x
+    plt.yticks(fontsize=16, rotation =0)
     plt.ylabel("Sequence's ID", fontsize=14)
+
+
     plt.savefig(os.path.join('individuals_comps', f'{filename[5:-4]}.png'), dpi=500.0)
